@@ -1,44 +1,123 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <th:block th:replace="~{layout :: setFragment(~{this::content})}">
     <th:block th:fragment="content">
-        <div class="container-sm">
-            <h1>Board Detail Page</h1>
-            <form action="/board/modify" method="post" id="modForm">
-                <input type="hidden" name="bno" th:value="${bvo.bno}">
-                <div class="my-3">
-                    <label for="created">Created At : </label>
-                    <input type="text" class="form-control" id="created" th:value="${bvo.regAt}" readonly>
-                </div>
-                <div class="mb-3">
-                    <label for="modified">Modified At : </label>
-                    <input type="text" class="form-control" id="modified" th:value="${bvo.modAt}" readonly>
-                </div>
-                <div class="mb-3">
-                    <label for="title">Title : </label>
-                    <input type="text" class="form-control" id="title" name="title"
-                           th:value="${bvo.title}" readonly>
-                </div>
-                <div class="mb-3">
-                    <label for="writer">Writer : </label>
-                    <input type="text" class="form-control" id="writer" name="writer"
-                           th:value="${bvo.writer}" readonly>
-                </div>
-                <div class="mb-3">
-                    <label for="content">Content : </label>
-                    <textarea name="content" id="content" cols="50" rows="5"
-                              class="form-control" readonly>[[${bvo.content}]]
-                    </textarea>
-                </div>
-                <button type="button" id="listBtn" class="btn btn-outline-primary">List</button>
-                <button type="button" id="modBtn"  class="btn btn-outline-warning">Modify</button>
-                <button type="button" id="delBtn" class="btn btn-outline-danger">Remove</button>
-            </form>
-            <form action="/board/remove" method="post" id="delForm" style="display:none">
-                <input type="hidden" name="bno" th:value="${bvo.bno}">
-            </form>
-        </div>
+        <th:block th:with="bvo=${bdto.bvo}">
+            <th:block th:with="auth=${#authentication.getPrincipal()}">
+                <div class="container-sm" >
+                    <h1>Board Detail Page</h1>
+                    <form action="/board/modify" method="post" id="modForm">
+                        <div class="mb-3">
+                            <label for="n" class="form-label">bno</label>
+                            <input type="text" class="form-control" name="bno" id="n" th:value="${bdto.bvo.bno}" readonly="readonly">
+                        </div>
+                        <div class="mb-3">
+                            <label for="t" class="form-label">title</label>
+                            <input type="text" class="form-control" name="title" id="t" th:value="${bdto.bvo.title}" readonly="readonly">
+                        </div>
+                        <div class="mb-3">
+                            <label for="w" class="form-label">writer</label>
+                            <input type="text" class="form-control" name="writer" id="w" th:value="${bdto.bvo.writer}" readonly="readonly">
+                        </div>
+                        <div class="mb-3">
+                            <label for="r" class="form-label">regAt</label>
+                            <input type="text" class="form-control" name="regAt" id="r" th:value="${bdto.bvo.regAt}" readonly="readonly">
+                        </div>
+                        <div class="mb-3">
+                            <label for="m" class="form-label">modAt</label>
+                            <input type="text" class="form-control" name="modAt" id="m" th:value="${bdto.bvo.modAt}" readonly="readonly">
+                        </div>
+                        <div class="mb-3">
+                            <label for="c" class="form-label">content</label>
+                            <textarea class="form-control" id="c" name="content" aria-label="With textarea" readonly="readonly">[[${bdto.bvo.content}]]</textarea>
+                        </div>
 
-        <script th:src="@{/js/boardDeail.js}"></script>
+                        <div class="mb-3">
+                            <ul class="list-group list-group-flush">
+                                <li th:each="fvo : ${bdto.flist}" class="list-group-item">
+                                    <div th:if="${fvo.fileType > 0}" class="ms-2 me-auto">
+                                        <img alt="그림없음"  th:src="@{|/upload/${fvo.saveDir}/${fvo.uuid}_th_${fvo.fileName}|}">
+                                    </div>
+                                    <div th:unless="${fvo.fileType > 0}" class="ms-2 me-auto">
+
+                                    </div>
+                                    <!-- 파일 이름 작성일 사이즈 -->
+                                    <div class="ms-2 me-auto">
+                                        <div class="fw-bold">[[${fvo.fileName }]]</div>
+                                        [[${fvo.regAt }]]
+                                        <span class="badge text-bg-warning">[[${fvo.fileSize }]]Byte</span>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <br>
+                        <hr>
+                        <button type="button" id="listBtn" class="btn btn-outline-primary">List</button>
+                        <!-- detail page 에서 modify 상태로 변경하기 위한 버튼 -->
+                        <th:block th:if="${(auth.mvo.nickName eq bdto.bvo.writer) or #authorization.expression('hasRole(''ROLE_ADMIN'')')}" >
+                            <button type="button" id="modBtn"  class="btn btn-outline-warning">Modify</button>
+                            <button type="button" id="delBtn" class="btn btn-outline-danger">Remove</button>
+                        </th:block>
+                    </form>
+                    <form action="/board/remove" method="post" id="delForm" style="display: none">
+                        <input type="hidden" name="bno" th:value="${bvo.bno}">
+                    </form>
+                    <hr>
+                    <br>
+                    <!-- Comment Line -->
+                    <!-- 댓글 등록 라인 -->
+                    <div class="input-group mb-3">
+                        <input type="text" id="cmtWriter" class="form-control" aria-label="Username" aria-describedby="basic-addon1" th:value="${auth.mvo.nickName}">
+                        <input type="text" id="cmtText" class="form-control" placeholder="Add Comment.." aria-label="Username" aria-describedby="basic-addon1">
+                        <button type="button" id="cmtAddBtn" class="btn btn-secondary">POST</button>
+                    </div>
+                    <br>
+                    <!-- 댓글 출력 라인 -->
+                    <ul class="list-group list-group-flush" id="cmtListArea">
+                        <li class="list-group-item">
+                            <div class="input-group mb-3">
+                                <div class="fw-bold">Writer</div>
+                                content
+                            </div>
+                            <span class="badge rounded-pill text-bg-warning">regDate</span>
+                        </li>
+                    </ul>
+                    <!-- 댓글 더보기 버튼 -->
+                    <div>
+                        <button type="button" id="moreBtn" class="btn btn-dark" data-page="1" style="visibility:hidden"> MORE + </button>
+                    </div>
+                    <!-- 모달창 라인 -->
+                    <div class="modal" id="myModal" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="modWriter"></h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <input type="text" class="form-control" id="cmtTextMod">
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">close</button>
+                                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="cmtModBtn">modify</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <script th:inline="javascript">
+                    let bnoVal = [[${bdto.bvo.bno}]];
+                    let authNickname = [[${auth.mvo.nickName}]]
+                    let writer = [[${bdto.bvo.writer}]]
+                    let admin = [[${#authorization.expression('hasRole(''ROLE_ADMIN'')')}]]
+                </script>
+                <script th:src="@{/js/boardDetailComment.js}"></script>
+                <script th:src="@{/js/boardDetail.js}"></script>
+                <script type="text/javascript">
+                    spreadList(bnoVal);
+                </script>
+            </th:block>
+        </th:block>
     </th:block>
 </th:block>
+</html>

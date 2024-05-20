@@ -3,21 +3,30 @@
 <th:block th:replace="~{layout :: setFragment(~{this::content})}">
     <th:block th:fragment="content">
         <div class="container-sm">
-           <form action="/board/register" method="post">
-               <div class="input-group mb-3">
-                   <span class="input-group-text" id="t">title</span>
-                   <input type="text" class="form-control"  name="title" placeholder="title" aria-label="Username" aria-describedby="basic-addon1">
-               </div>
-               <div class="input-group mb-3">
-                   <span class="input-group-text" id="w">writer</span>
-                   <input type="text" class="form-control"  name="writer" placeholder="writer" aria-label="Username" aria-describedby="basic-addon1">
-               </div>
-               <div class="input-group">
-                   <span class="input-group-text" id="c">With textarea</span>
-                   <textarea class="form-control" aria-label="With textarea" name="content"></textarea>
-               </div>
-               <button type="submit" class="btn btn-primary">register</button>
-           </form>
+            <h1>Board Register Page</h1>
+            <form action="/board/register" method="post" enctype="multipart/form-data">
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="t">Title</span>
+                    <input type="text" class="form-control" placeholder="Title" name="Title" aria-label="Username" aria-describedby="basic-addon1">
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="w">Writer</span>
+                    <input type="text" class="form-control" name="Writer" aria-label="Username" aria-describedby="basic-addon1" th:with="auth=${#authentication.getPrincipal()}" th:value="${auth.mvo.nickName}">
+                </div>
+                <div class="input-group">
+                    <span class="input-group-text" id="c">Content</span>
+                    <textarea class="form-control" aria-label="With textarea" name="content"></textarea>
+                </div>
+                <div class="input-group mb-3">
+                    <input type="file" class="form-control" name="files" id="files" multiple style="display: none">
+                </div>
+
+                <button type="button" class="btn btn-outline-primary" id="trigger">File Upload</button>
+                <div class="input-group mb-3" id="fileZone"></div>
+                <button type="submit" class="btn btn-primary" id="regBtn">Register</button>
+            </form>
         </div>
+        <script th:src="@{/js/boardRegister.js}"></script>
     </th:block>
 </th:block>
+</html>

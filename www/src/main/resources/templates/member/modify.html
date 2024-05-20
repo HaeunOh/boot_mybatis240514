@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{layout :: setFragment(~{this::content})}">
+    <th:block th:fragment="content">
+        <th:block th:with="list=${list}">
+        <div class="container-sm">
+            <h1>Member Detail page</h1>
+            <form action="/member/modify" method="post" th:with="auth=${#authentication.getPrincipal()}" id="modForm">
+                <div class="mb-3">
+                    <label for="e" class="form-label">E-MAIL</label>
+                    <input type="email" class="form-control" name="email" id="e" th:value="${auth.mvo.email}" readonly="readonly">
+                </div>
+                <div class="mb-3" style="display: none" id="passDiv">
+                    <label for="p" class="form-label">PassWord</label>
+                    <input type="password" class="form-control" name="password" id="p">
+                </div>
+                <div class="mb-3">
+                    <label for="n" class="form-label">nick_Name</label>
+                    <input type="text" class="form-control" name="nickName" id="n" th:value="${auth.mvo.nickName}" readonly="readonly">
+                </div>
+                <button type="button" class="btn btn-warning" id="modBtn">MODIFY</button>
+                <a th:href="@{/member/remove(email=${auth.mvo.email})}"><button type="button" class="btn btn-danger" id="delBtn">DELETE</button></a>
+            </form>
+        </div>
+            <script th:src="@{/js/memberDetail.js}"></script>
+        </th:block>
+    </th:block>
+</th:block>
+</html>

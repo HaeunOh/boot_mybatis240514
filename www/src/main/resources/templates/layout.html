@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="www.thymeleaf.org"  lang="en">
+<html xmlns:th="www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml" lang="en">
 <th:block th:fragment="setFragment(content)">
     <head>
         <meta charset="UTF-8">
@@ -25,6 +25,25 @@
                     </li>
                     <li>
                         <a class="nav-link" th:href="@{/board/list}">게시판 보기</a>
+                    </li>
+                    <li class="nav-item"  sec:authorize="isAnonymous()">
+                        <a class="nav-link" th:href="@{/member/register}">회원가입</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="isAnonymous()">
+                        <a class="nav-link" th:href="@{/member/login}">로그인</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="isAuthenticated()">
+                        <a class="nav-link" th:href="@{/member/modify}"
+                           th:with="auth=${#authentication.getPrincipal()}" th:text="|${auth.mvo.nickName} ${auth.mvo.lastLogin}|"></a>
+                        <!-- 이메일 가져올때 th:text="${#authentication.name}"-->
+                    </li>
+                    <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_ADMIN')">
+                        <a class="nav-link" th:href="@{/member/list}">회원리스트</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="isAuthenticated()">
+                        <a class="nav-link" th:href="@{/member/logout}" id="logoutLink">로그아웃</a>
+                        <!--<form action="/member/logout" method="post" id="logoutForm">
+                        </form>-->
                     </li>
                 </ul>
             </div>

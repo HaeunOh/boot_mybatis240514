@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{layout :: setFragment(~{this::content})}">
+    <th:block th:fragment="content">
+        <div class="container-sm">
+            <h1>Member List page</h1>
+            <div class="row">
+                    <div class="col" th:each="list: ${list}">
+                        <div class="card" style="width: 18rem;">
+                            <img src="/dist/image/코니.png" class="card-img-top" alt="...">
+                            <div class="card-body">
+                                <h5 class="card-title">NickName | [[${list.nickName}]]</h5>
+                                <p class="card-text">Email | [[${list.email}]]</p>
+                                <p class="card-text">RegAt | [[${list.regAt}]]</p>
+                                <p class="card-text">LastLogin | [[${list.lastLogin}]]</p>
+                                <p class="card-text" th:each="authList : ${list.authList}">
+                                    [[${authList.auth}]]
+                                </p>
+
+                            </div>
+                        </div>
+                    </div>
+            </div>
+        </div>
+    </th:block>
+</th:block>
+</html>
